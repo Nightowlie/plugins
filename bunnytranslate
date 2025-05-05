@@ -1,0 +1,85 @@
+{
+  "manifestVersion": 1,
+  "name": "ContextMenu Translator",
+  "version": "1.0.1",
+  "author": "Your Name / AI Assistant",
+  "description": "Translates received messages via the long-press context menu.",
+  "targetClient": "Bunny", // Hypothetical field indicating compatibility
+  "permissions": [ // Hypothetical permissions the plugin might need
+    "contextMenu.message.add",
+    "api.translate", // Access to a translation service (built-in or external)
+    "ui.displayNotification" // To show results or errors
+  ],
+
+  "settings": [ // User-configurable settings
+    {
+      "id": "targetLanguage",
+      "label": "Target Translation Language",
+      "description": "Select the language to translate messages into.",
+      "type": "dropdown", // Assuming Bunny supports form element types
+      "options": [ // ISO 639-1 codes are common
+        {"value": "en", "label": "English"},
+        {"value": "es", "label": "Spanish"},
+        {"value": "fr", "label": "French"},
+        {"value": "de", "label": "German"},
+        {"value": "ja", "label": "Japanese"},
+        {"value": "ko", "label": "Korean"},
+        {"value": "zh-CN", "label": "Chinese (Simplified)"},
+        {"value": "ru", "label": "Russian"},
+        // Add more languages as needed
+        {"value": "fi", "label": "Finnish"} // Added based on your location :)
+      ],
+      "default": "en"
+    }
+    // Depending on the translation service, API key settings might be needed here
+    // {
+    //   "id": "translationApiKey",
+    //   "label": "Translation API Key (Optional)",
+    //   "type": "password",
+    //   "description": "Required if Bunny doesn't have a built-in free tier."
+    // }
+  ],
+
+  "contributions": { // How the plugin integrates with the UI
+    "contextMenus": [
+      {
+        "target": "message", // Specifies this applies to the message context menu
+        "item": {
+          "id": "translateMessageAction",
+          "label": "Translate Message", // Text shown in the menu
+          "icon": "translate", // Optional: Assumes Bunny has built-in icons
+          "action": "triggerTranslation" // References an action defined below
+        }
+      }
+    ]
+  },
+
+  "actions": [ // Defines what happens when UI elements are interacted with
+    {
+      "id": "triggerTranslation",
+      "description": "Initiates the translation process for the selected message.",
+      "run": {
+        // This part is highly dependent on Bunny's API
+        "type": "apiCall", // Hypothetical action type: call an internal or external API
+        "service": "bunny.translate", // Assumes Bunny provides a translation function
+        "parameters": {
+          // Placeholders syntax is hypothetical:
+          "text": "{context.message.content}", // Get content from the context (the message)
+          "targetLang": "{settings.targetLanguage}", // Get target language from settings
+          "sourceLang": "auto" // Ask the service to auto-detect source language
+          // "apiKey": "{settings.translationApiKey}" // Pass API key if needed
+        },
+        "onSuccess": { // What to do if translation works
+          "display": "modal", // How to show the result: 'modal', 'tooltip', 'inline', 'notification'
+          "title": "Translation ({result.detectedSourceLang} -> {settings.targetLanguage})",
+          "content": "{result.translatedText}" // Placeholder for the translated text from the API response
+        },
+        "onError": { // What to do if translation fails
+          "display": "notification",
+          "type": "error",
+          "message": "Translation failed: {error.message}" // Placeholder for the error message
+        }
+      }
+    }
+  ]
+}
